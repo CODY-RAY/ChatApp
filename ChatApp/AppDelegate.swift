@@ -13,10 +13,44 @@ import CoreData
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
-
+    static let local = "192.168.111.135"
+    static let web = "crank.tech"
+    static var token = ""
+    
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
+        let file = "Token.txt" //this is the file. we will write to and read from it
+        
+        if let dir = FileManager.default.urls(for: .libraryDirectory, in: .userDomainMask).first {
+            let fileURL = dir.appendingPathComponent(file)
+            do {
+               AppDelegate.token = try String(contentsOf: fileURL, encoding: .utf8)
+                
+            }
+            catch {
+            
+            }
+            
+            if(AppDelegate.token != "" ){
+            let mainStoryboard = UIStoryboard(name: "Main", bundle: nil)
+            
+            // rootViewController
+            let rootViewController = mainStoryboard.instantiateViewController(withIdentifier: "ChatsViewController") as? ChatsViewController
+            
+            // navigationController
+            let navigationController = UINavigationController(rootViewController: rootViewController!)
+                
+            // self.window
+            self.window = UIWindow(frame: UIScreen.main.bounds)
+            
+            self.window!.rootViewController = navigationController
+            
+            self.window!.makeKeyAndVisible()
+            }
+        }
+        
+        
         return true
     }
 
@@ -41,6 +75,24 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func applicationWillTerminate(_ application: UIApplication) {
         // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
         // Saves changes in the application's managed object context before the application terminates.
+       
+        let file = "Token.txt" //this is the file. we will write to and read from it
+        
+        if let dir = FileManager.default.urls(for: .libraryDirectory, in: .userDomainMask).first {
+            
+            let fileURL = dir.appendingPathComponent(file)
+            
+            //writing
+            do {
+                try AppDelegate.token.write(to: fileURL, atomically: true, encoding: .utf8)
+            }
+            catch {/* error handling here */}
+        }
+        
+        
+        
+            // failed to write file – bad permissions, bad filename, missing permissions, or more likely it can't be converted to the encoding
+        
         self.saveContext()
     }
 
